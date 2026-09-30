@@ -53,17 +53,17 @@ struct SettingsView: View {
                 Section {
                     Toggle("Show notifications", isOn: $notify)
                     Toggle("When a session finishes and waits for you", isOn: $notifyIdle).disabled(!notify)
-                    Text("You're also notified when prompts sent from Claude Deck finish, when a budget hits 80% or 100%, and when Claude needs permission.")
+                    Text("You're also notified when prompts sent from Claudeck finish, when a budget hits 80% or 100%, and when Claude needs permission.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Button("Send a test notification") { Notifier.shared.post("Claude Deck", "Notifications are working.") }
+                    Button("Send a test notification") { Notifier.shared.post("Claudeck", "Notifications are working.") }
                 }
-                Section("Approve permissions from Claude Deck") {
+                Section("Approve permissions from Claudeck") {
                     Toggle("Answer Claude's permission prompts here", isOn: Binding(
                         get: { bridge.installed },
                         set: { on in do { try on ? bridge.install() : bridge.uninstall() } catch { self.error = error.localizedDescription } }
                     ))
                     Stepper("Wait \(Int(approvalWait)) seconds for an answer, then ask in the terminal", value: $approvalWait, in: 10...120, step: 5)
-                    Text("Adds a PermissionRequest hook to ~/.claude/settings.json (a backup is kept). When Claude needs approval you get a notification with Allow / Deny, and the request shows in the menu bar. Toggle off and on again after changing the wait so the hook's timeout matches. If Claude Deck isn't open, the terminal asks as usual.")
+                    Text("Adds a PermissionRequest hook to ~/.claude/settings.json (a backup is kept). When Claude needs approval you get a notification with Allow / Deny, and the request shows in the menu bar. Toggle off and on again after changing the wait so the hook's timeout matches. If Claudeck isn't open, the terminal asks as usual.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let error { Text(error).foregroundStyle(.red) }

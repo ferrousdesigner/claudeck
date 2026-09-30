@@ -2,9 +2,9 @@ import Foundation
 import Combine
 import AppKit
 
-/// Lets you approve Claude Code permission prompts from Claude Deck.
+/// Lets you approve Claude Code permission prompts from Claudeck.
 ///
-/// Claude Deck installs itself as a `PermissionRequest` hook. When Claude needs approval the hook
+/// Claudeck installs itself as a `PermissionRequest` hook. When Claude needs approval the hook
 /// (this same binary, run with `--hook permission`) drops a request file and waits briefly for an answer
 /// from the app. No answer, or the app isn't open, means the normal terminal prompt appears.
 /// A `Notification` hook forwards "Claude needs your permission" events so the app can alert you.
@@ -65,7 +65,7 @@ enum HookMode {
                     try? FileManager.default.removeItem(at: respURL)
                     try? FileManager.default.removeItem(at: reqURL)
                     var decision: [String: Any] = ["behavior": behavior]
-                    if behavior == "deny" { decision["message"] = "Denied from Claude Deck." }
+                    if behavior == "deny" { decision["message"] = "Denied from Claudeck." }
                     let out: [String: Any] = ["hookSpecificOutput": ["hookEventName": "PermissionRequest", "decision": decision]]
                     if let od = try? JSONSerialization.data(withJSONObject: out) { FileHandle.standardOutput.write(od) }
                     exit(0)
@@ -103,7 +103,7 @@ final class PermissionBridge: ObservableObject {
     private var eventsOffset: UInt64 = 0
     private var notified = Set<String>()
 
-    var hookCommand: String { "\(Handoff.shellQuote(Bundle.main.executablePath ?? "/Applications/Claude Deck.app/Contents/MacOS/ClaudeDeck"))" }
+    var hookCommand: String { "\(Handoff.shellQuote(Bundle.main.executablePath ?? "/Applications/Claudeck.app/Contents/MacOS/Claudeck"))" }
 
     init() {
         try? FileManager.default.createDirectory(at: HookMode.requestsDir, withIntermediateDirectories: true)
@@ -111,6 +111,7 @@ final class PermissionBridge: ObservableObject {
         try? String(ProcessInfo.processInfo.processIdentifier).write(to: HookMode.aliveFile, atomically: true, encoding: .utf8)
         eventsOffset = (try? FileManager.default.attributesOfItem(atPath: HookMode.eventsFile.path)[.size] as? UInt64) ?? 0
         refreshInstalled()
+        repointHooks()
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.poll() }
         }
@@ -118,6 +119,16 @@ final class PermissionBridge: ObservableObject {
 
     func refreshInstalled() {
         installed = ClaudeSettings.hooks(Paths.settingsFile).contains { $0.command.contains("--hook permission") }
+    }
+
+    /// If the hooks point at another copy of the app (such as "Claude Deck.app" from before the rename),
+    /// re-install them for this one. Only an installed .app does this, so debug builds leave them alone.
+    private func repointHooks() {
+        guard installed, Bundle.main.bundlePath.hasSuffix(".app") else { return }
+        let ours = ClaudeSettings.hooks(Paths.settingsFile).filter { $0.command.contains("--hook permission") || $0.command.contains("--hook event") }
+        guard ours.contains(where: { !$0.command.hasPrefix(hookCommand + " ") }) else { return }
+        try? uninstall()
+        try? install()
     }
 
     func install() throws {

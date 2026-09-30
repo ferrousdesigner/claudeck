@@ -1,6 +1,6 @@
 import Foundation
 
-/// `ClaudeDeck --selftest` exercises the non-UI features against real data and temp files, printing PASS/FAIL.
+/// `Claudeck --selftest` exercises the non-UI features against real data and temp files, printing PASS/FAIL.
 enum SelfTest {
     nonisolated(unsafe) static var failures = 0
 
@@ -62,7 +62,7 @@ enum SelfTest {
         try? ClaudeSettings.addHook(hook, to: sf) // duplicate is ignored
         check("hook added once", ClaudeSettings.hooks(sf).count == 1)
         check("other settings kept", (ClaudeSettings.read(sf)["theme"] as? String) == "dark" && (ClaudeSettings.read(sf)["env"] as? [String: String])?["A"] == "1")
-        check("backup written", FileManager.default.fileExists(atPath: sf.path + ".claude-deck.bak"))
+        check("backup written", FileManager.default.fileExists(atPath: sf.path + ".claudeck.bak"))
         try? ClaudeSettings.removeHook(hook, from: sf)
         check("hook removed and empty keys cleaned", ClaudeSettings.hooks(sf).isEmpty && ClaudeSettings.read(sf)["hooks"] == nil)
         var perm = ClaudeSettings.Permissions(allow: ["Bash(npm test:*)", "Bash"], deny: ["Read(./.env)"], defaultMode: "acceptEdits")
@@ -141,8 +141,8 @@ enum SelfTest {
         // Projects
         let health = Projects.health(sessions)
         check("project health", !health.isEmpty, health.prefix(4).map { "\($0.name) \($0.git.isRepo ? "git:\($0.git.branch ?? "?") Δ\($0.git.changedFiles)" : "no git")" }.joined(separator: "; "))
-        let deck = Projects.gitStatus(Paths.home.path + "/Projects/claude-deck")
-        check("git status on claude-deck", deck.isRepo && deck.changedFiles > 0, "branch \(deck.branch ?? "?"), \(deck.changedFiles) changed")
+        let deck = Projects.gitStatus(FileManager.default.currentDirectoryPath)
+        check("git status on the current folder", deck.isRepo && deck.changedFiles > 0, "branch \(deck.branch ?? "?"), \(deck.changedFiles) changed")
 
         // Worktrees on a scratch repo
         let repo = tmp.appendingPathComponent("repo").path

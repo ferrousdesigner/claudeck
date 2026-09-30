@@ -88,7 +88,7 @@ final class SessionWorker: @unchecked Sendable {
         let fm = FileManager.default
         var results: [SessionSummary] = []
         var changed: [SessionSummary] = []
-        let ignoreCwd = Paths.appSupport.path
+        let ignoreCwd: Set<String> = [Paths.appSupport.path, Paths.legacyAppSupport.path]
 
         let projectDirs = (try? fm.contentsOfDirectory(at: Paths.projectsDir, includingPropertiesForKeys: nil)) ?? []
         for dir in projectDirs {
@@ -117,7 +117,7 @@ final class SessionWorker: @unchecked Sendable {
                     }
                 }
 
-                if summary.isEmpty || summary.cwd == ignoreCwd { continue }
+                if summary.isEmpty || ignoreCwd.contains(summary.cwd ?? "") { continue }
                 results.append(summary)
                 if didChange { changed.append(summary) }
             }
@@ -135,7 +135,7 @@ final class SessionWorker: @unchecked Sendable {
                   let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let pid = o["pid"] as? Int, let sid = o["sessionId"] as? String else { continue }
             guard kill(pid_t(pid), 0) == 0 else { continue } // process is gone
-            if (o["cwd"] as? String) == Paths.appSupport.path { continue }
+            if let cwd = o["cwd"] as? String, [Paths.appSupport.path, Paths.legacyAppSupport.path].contains(cwd) { continue }
             let ms: (String) -> Date? = { key in (o[key] as? Double).map { Date(timeIntervalSince1970: $0 / 1000) } }
             var remote = o["bridgeSessionId"] as? String
             if let r = remote, !r.hasPrefix("http") { remote = "https://claude.ai/code/\(r)" }

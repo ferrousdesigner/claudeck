@@ -1,9 +1,10 @@
 #!/bin/zsh
-# Builds "Claude Deck.app" (and a .dmg) into ./dist.  Pass --install to copy it into /Applications.
+# Builds "Claudeck.app" (and a .dmg) into ./dist.  Pass --install to copy it into /Applications.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-APP_NAME="Claude Deck"
+APP_NAME="Claudeck"
+# Kept from when the app was called Claude Deck, so settings carry over.
 BUNDLE_ID="com.ferrousdesigner.claudedeck"
 VERSION=$(tr -d '[:space:]' < VERSION)
 BUILD=${BUILD:-$(git rev-list --count HEAD 2>/dev/null || echo 1)}
@@ -13,12 +14,12 @@ APP="$DIST/$APP_NAME.app"
 echo "▸ Building release binary (v$VERSION, build $BUILD)"
 swift build -c release --arch arm64 --arch x86_64 2>/dev/null || swift build -c release
 BIN_DIR=$(swift build -c release --show-bin-path 2>/dev/null)
-[[ -f .build/apple/Products/Release/ClaudeDeck ]] && BIN_DIR=.build/apple/Products/Release
+[[ -f .build/apple/Products/Release/Claudeck ]] && BIN_DIR=.build/apple/Products/Release
 
 echo "▸ Assembling $APP"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN_DIR/ClaudeDeck" "$APP/Contents/MacOS/ClaudeDeck"
+cp "$BIN_DIR/Claudeck" "$APP/Contents/MacOS/Claudeck"
 
 echo "▸ Rendering icon"
 ICONSET=$(mktemp -d)/AppIcon.iconset
@@ -38,7 +39,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleName</key><string>$APP_NAME</string>
   <key>CFBundleDisplayName</key><string>$APP_NAME</string>
   <key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
-  <key>CFBundleExecutable</key><string>ClaudeDeck</string>
+  <key>CFBundleExecutable</key><string>Claudeck</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
@@ -64,7 +65,10 @@ hdiutil create -volname "$APP_NAME" -srcfolder "$STAGE" -ov -format UDZO "$DMG" 
 
 if [[ "${1:-}" == "--install" ]]; then
   echo "▸ Installing to /Applications"
+  pkill -x Claudeck 2>/dev/null || true
+  # Remove the app from before it was renamed to Claudeck.
   pkill -x ClaudeDeck 2>/dev/null || true
+  rm -rf "/Applications/Claude Deck.app"
   rm -rf "/Applications/$APP_NAME.app"
   cp -R "$APP" /Applications/
   echo "✓ Installed /Applications/$APP_NAME.app"

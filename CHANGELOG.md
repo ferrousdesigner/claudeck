@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 (2026-09-30)
+
+- Renamed to Claudeck. Existing settings, memory docs, saved prompts and the approval hook carry over automatically.
+
 ## v1.0.1 (2026-09-30)
 
 - Release script now finishes the GitHub Release if the upload fails partway.

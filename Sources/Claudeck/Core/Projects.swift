@@ -124,7 +124,7 @@ enum Worktrees {
               let top = Projects.git(repo, ["rev-parse", "--show-toplevel"]) else {
             throw NSError(domain: "Worktrees", code: 1, userInfo: [NSLocalizedDescriptionKey: "\(repo) isn't a git repository."])
         }
-        let base = (top as NSString).deletingLastPathComponent + "/.claude-deck-worktrees/" + (top as NSString).lastPathComponent
+        let base = (top as NSString).deletingLastPathComponent + "/.claudeck-worktrees/" + (top as NSString).lastPathComponent
         try FileManager.default.createDirectory(atPath: base, withIntermediateDirectories: true)
         let stamp = String(Int(Date().timeIntervalSince1970) % 100000)
         let clean = String(slug.lowercased().map { $0.isLetter || $0.isNumber ? $0 : "-" }.prefix(24))

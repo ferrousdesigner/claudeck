@@ -160,7 +160,7 @@ struct HooksEditor: View {
                             HStack { Tag(text: h.event, color: .purple); if !h.matcher.isEmpty { Tag(text: h.matcher, color: .blue) }; if let t = h.timeout { Tag(text: "\(t)s") } }
                             Text(h.command).font(.caption.monospaced()).textSelection(.enabled).lineLimit(4)
                             if h.command.contains("--hook permission") || h.command.contains("--hook event") {
-                                Text("Installed by Claude Deck for approvals and alerts").font(.caption2).foregroundStyle(.secondary)
+                                Text("Installed by Claudeck for approvals and alerts").font(.caption2).foregroundStyle(.secondary)
                             }
                         }
                         Spacer()
@@ -217,7 +217,7 @@ struct HooksEditor: View {
                 }
             }
             if let error { Text(error).foregroundStyle(.red) }
-            Text("Changes apply to new Claude Code sessions. A backup of the original file is saved next to it as .claude-deck.bak.")
+            Text("Changes apply to new Claude Code sessions. A backup of the original file is saved next to it as .claudeck.bak.")
                 .font(.caption).foregroundStyle(.tertiary)
         }
         .onAppear(perform: load)

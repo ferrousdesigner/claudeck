@@ -128,7 +128,7 @@ final class Library: ObservableObject {
                                                                    permissionMode: t.permissionMode), label: label ?? t.name)
     }
 
-    /// Fires due schedules. Runs only while Claude Deck is open (it stays alive in the menu bar).
+    /// Fires due schedules. Runs only while Claudeck is open (it stays alive in the menu bar).
     func tick(now: Date = Date()) {
         for i in schedules.indices where schedules[i].isDue(now: now) {
             guard let t = template(schedules[i].templateID) else { continue }

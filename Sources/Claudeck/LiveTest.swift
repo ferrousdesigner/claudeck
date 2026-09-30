@@ -1,7 +1,7 @@
 import Foundation
 import AppKit
 
-/// `ClaudeDeck --livetest` runs end-to-end checks that talk to the real `claude` CLI (uses a few cheap Haiku calls).
+/// `Claudeck --livetest` runs end-to-end checks that talk to the real `claude` CLI (uses a few cheap Haiku calls).
 enum LiveTest {
     static func run() -> Never {
         let done = DispatchSemaphore(value: 0)

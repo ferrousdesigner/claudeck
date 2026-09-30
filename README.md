@@ -1,12 +1,12 @@
 <div align="center">
 
-# ✦ Claude Deck
+# ✦ Claudeck
 
 **A native macOS dashboard for [Claude Code](https://docs.claude.com/en/docs/claude-code).**
 
 See what Claude is doing right now, browse and search every past session, track cost, find out how to spend fewer tokens, and manage MCP servers, hooks and permissions without editing JSON.
 
-[![Latest release](https://img.shields.io/github/v/release/ferrousdesigner/claude-deck?label=release&color=D97757)](https://github.com/ferrousdesigner/claude-deck/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/ferrousdesigner/claudeck?label=release&color=D97757)](https://github.com/ferrousdesigner/claudeck/releases/latest)
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.10%2B-F05138?logo=swift&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-0A84FF)
@@ -17,7 +17,7 @@ See what Claude is doing right now, browse and search every past session, track 
 
 ---
 
-Claude Code already records every session in `~/.claude`. Claude Deck reads those files, so there is nothing to set up. Open it and your history is already there. New sessions show up within a few seconds, whether you run Claude in the terminal or in your editor.
+Claude Code already records every session in `~/.claude`. Claudeck reads those files, so there is nothing to set up. Open it and your history is already there. New sessions show up within a few seconds, whether you run Claude in the terminal or in your editor.
 
 It has no account, no server and no telemetry. Everything stays on your Mac.
 
@@ -34,7 +34,7 @@ It has no account, no server and no telemetry. Everything stays on your Mac.
   - **Files changed**: diffs against the file before the session, with a *Restore original* button.
   - **Continue here** or **Resume in Terminal** (`claude --resume`).
   - Export to Markdown, Word or PDF.
-  - Each session saved automatically as a readable Markdown **memory doc** in `~/Documents/Claude Deck/Sessions`.
+  - Each session saved automatically as a readable Markdown **memory doc** in `~/Documents/Claudeck/Sessions`.
 - **Search** (⇧⌘F): full-text search across everything you and Claude wrote, and every command Claude ran, in all projects.
 - **Projects**: every folder you've used Claude Code in, with its branch, uncommitted changes, unpushed commits, and open threads taken from session summaries.
 
@@ -71,9 +71,9 @@ It has no account, no server and no telemetry. Everything stays on your Mac.
 
 ### Download
 
-**[⬇ Download Claude Deck.dmg](https://github.com/ferrousdesigner/claude-deck/raw/main/download/Claude%20Deck.dmg)**: the latest version, a universal build for Apple silicon and Intel Macs, about 5 MB. Older versions and release notes are on the [Releases](https://github.com/ferrousdesigner/claude-deck/releases) page, and every change is listed in the [CHANGELOG](CHANGELOG.md).
+**[⬇ Download Claudeck.dmg](https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg)**: the latest version, a universal build for Apple silicon and Intel Macs, about 5 MB. Older versions and release notes are on the [Releases](https://github.com/ferrousdesigner/claudeck/releases) page, and every change is listed in the [CHANGELOG](CHANGELOG.md).
 
-1. Open the `.dmg` and drag **Claude Deck** into **Applications**.
+1. Open the `.dmg` and drag **Claudeck** into **Applications**.
 2. The app is ad-hoc signed, not notarized, so the first time you open it macOS may say it can't verify the developer. Right-click the app, choose **Open**, then **Open** again. On macOS 15 and later, you may instead need to go to **System Settings → Privacy & Security** and click **Open Anyway**.
 
 ### Requirements
@@ -84,20 +84,20 @@ It has no account, no server and no telemetry. Everything stays on your Mac.
 ### Build from source
 
 ```bash
-git clone https://github.com/ferrousdesigner/claude-deck.git
-cd claude-deck
+git clone https://github.com/ferrousdesigner/claudeck.git
+cd claudeck
 scripts/build_app.sh --install
 ```
 
-This builds a universal release binary, packages `Claude Deck.app` and a `.dmg` in `dist/`, and copies the app into `/Applications`. Leave off `--install` to only build.
+This builds a universal release binary, packages `Claudeck.app` and a `.dmg` in `dist/`, and copies the app into `/Applications`. Leave off `--install` to only build.
 
 ### Run in development
 
 ```bash
 swift build
-.build/debug/ClaudeDeck                 # launch the app
-.build/debug/ClaudeDeck --selftest      # run the self-tests against your real ~/.claude data
-.build/debug/ClaudeDeck --tab Improvements   # open straight to a tab
+.build/debug/Claudeck                 # launch the app
+.build/debug/Claudeck --selftest      # run the self-tests against your real ~/.claude data
+.build/debug/Claudeck --tab Improvements   # open straight to a tab
 ```
 
 ## Keyboard shortcuts
@@ -113,13 +113,13 @@ swift build
 
 ## Privacy
 
-Claude Deck has no backend. Here is everything it touches:
+Claudeck has no backend. Here is everything it touches:
 
 - **Reads** `~/.claude`: sessions, settings, skills, plugins and file history.
 - **Writes**:
-  - Memory docs and digests to `~/Documents/Claude Deck`.
-  - App data to `~/Library/Application Support/Claude Deck`.
-  - `~/.claude` settings, only when you change something in the app. Before its first change to a settings file it saves a backup next to it (`*.claude-deck.bak`).
+  - Memory docs and digests to `~/Documents/Claudeck`.
+  - App data to `~/Library/Application Support/Claudeck`.
+  - `~/.claude` settings, only when you change something in the app. Before its first change to a settings file it saves a backup next to it (`*.claudeck.bak`).
 - **Network**: none of its own. The only network traffic comes from Claude Code runs you start. AI summaries and digests count as those runs, and they aren't saved as sessions.
 
 Costs are estimated at API list prices. On a Pro or Max plan you aren't billed per token, so read them as a measure of how hard you're using your plan.
@@ -129,8 +129,8 @@ Costs are estimated at API list prices. On a Pro or Max plan you aren't billed p
 ```
 VERSION                  # current version, e.g. 1.0.0
 CHANGELOG.md             # one entry per release
-download/                # prebuilt Claude Deck.dmg (latest release)
-Sources/ClaudeDeck/
+download/                # prebuilt Claudeck.dmg (latest release)
+Sources/Claudeck/
 ├── App.swift            # app entry, tabs, menus, launch arguments
 ├── Core/                # parsing, pricing, cost advisor, settings, MCP, runner, search
 └── Views/               # one SwiftUI view per tab, plus the guide, menu bar and composer
@@ -144,11 +144,11 @@ There are no third-party dependencies. It uses only SwiftUI, AppKit, Charts and 
 
 ## Contributing
 
-Issues and pull requests are welcome. Before opening a PR, run `swift build` and `.build/debug/ClaudeDeck --selftest`, and check that the self-test ends with `ALL PASSED`.
+Issues and pull requests are welcome. Before opening a PR, run `swift build` and `.build/debug/Claudeck --selftest`, and check that the self-test ends with `ALL PASSED`.
 
 ## Versioning and releases
 
-Claude Deck uses [semantic versioning](https://semver.org). The `VERSION` file is the single source of truth: it becomes the app's version in *About Claude Deck*, and each release is tagged `vX.Y.Z`.
+Claudeck uses [semantic versioning](https://semver.org). The `VERSION` file is the single source of truth: it becomes the app's version in *About Claudeck*, and each release is tagged `vX.Y.Z`.
 
 Every commit to `main` is made as a release:
 
@@ -163,10 +163,10 @@ The script runs these steps in order:
 
 1. Bumps `VERSION`.
 2. Runs the self-test, and stops without committing if it fails.
-3. Rebuilds `download/Claude Deck.dmg`.
+3. Rebuilds `download/Claudeck.dmg`.
 4. Adds a `CHANGELOG.md` entry.
 5. Commits as `vX.Y.Z: <notes>`, tags it, and pushes.
-6. Publishes a [GitHub Release](https://github.com/ferrousdesigner/claude-deck/releases) with the `.dmg` attached.
+6. Publishes a [GitHub Release](https://github.com/ferrousdesigner/claudeck/releases) with the `.dmg` attached.
 
 The build number is the commit count.
 
@@ -176,4 +176,4 @@ The build number is the commit count.
 
 ---
 
-<sub>Claude Deck is an independent project and is not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic.</sub>
+<sub>Claudeck is an independent project and is not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic.</sub>

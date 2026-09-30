@@ -1,10 +1,10 @@
 import Foundation
 
-/// Writes one Markdown "memory doc" per Claude Code session into ~/Documents/Claude Deck/Sessions.
+/// Writes one Markdown "memory doc" per Claude Code session into ~/Documents/Claudeck/Sessions.
 /// Docs are regenerated whenever the session transcript grows, and include the AI summary once generated.
 final class MemoryWriter: @unchecked Sendable {
     static let shared = MemoryWriter()
-    private let queue = DispatchQueue(label: "claude-deck.memory", qos: .utility)
+    private let queue = DispatchQueue(label: "claudeck.memory", qos: .utility)
     private var index: [String: String] = [:] // session id -> file name
     private var indexLoaded = false
 

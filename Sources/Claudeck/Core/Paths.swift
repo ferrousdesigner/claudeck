@@ -11,15 +11,32 @@ enum Paths {
     /// Working directory used for the dashboard's own helper calls (summaries),
     /// so they never show up mixed into real project sessions.
     static let appSupport: URL = {
-        let u = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Claude Deck")
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let u = base.appendingPathComponent("Claudeck")
+        moveLegacy(base.appendingPathComponent(legacyName), to: u)
         try? FileManager.default.createDirectory(at: u, withIntermediateDirectories: true)
         return u
     }()
 
-    static var defaultMemoryDir: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Claude Deck")
+    /// The app was called "Claude Deck" before 1.1. Its helper runs used this folder as their cwd,
+    /// so sessions recorded there are still hidden from the session list.
+    static let legacyName = "Claude Deck"
+    static var legacyAppSupport: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent(legacyName)
+    }
+
+    static let defaultMemoryDir: URL = {
+        let base = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let u = base.appendingPathComponent("Claudeck")
+        moveLegacy(base.appendingPathComponent(legacyName), to: u)
+        return u
+    }()
+
+    /// Moves a folder from before the rename to its new name, unless the new one already exists.
+    private static func moveLegacy(_ old: URL, to new: URL) {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: old.path), !fm.fileExists(atPath: new.path) else { return }
+        try? fm.moveItem(at: old, to: new)
     }
 
     static var memoryDir: URL {

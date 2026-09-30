@@ -63,7 +63,7 @@ struct LibraryView: View {
                     } label: { Label("Add schedule", systemImage: "plus") }.fixedSize()
                 }
                 .padding(.top, 8)
-                Text("Schedules run while Claude Deck is open — it keeps running in the menu bar when you close the window. Turn on “Open at login” in Settings so they never miss.")
+                Text("Schedules run while Claudeck is open — it keeps running in the menu bar when you close the window. Turn on “Open at login” in Settings so they never miss.")
                     .font(.callout).foregroundStyle(.secondary)
                 if library.schedules.isEmpty {
                     Card { Text("No schedules yet. Try “Standup summary” every weekday at 9:00.").foregroundStyle(.secondary) }

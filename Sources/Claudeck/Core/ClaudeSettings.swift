@@ -1,7 +1,7 @@
 import Foundation
 
 /// Read-modify-write access to a Claude Code settings.json. Every write keeps the file's other keys,
-/// and the first write in a session backs the original up to settings.json.claude-deck.bak.
+/// and the first write in a session backs the original up to settings.json.claudeck.bak.
 enum ClaudeSettings {
     enum Scope: String, CaseIterable, Identifiable {
         case user = "User (~/.claude/settings.json)"
@@ -31,7 +31,7 @@ enum ClaudeSettings {
         let fm = FileManager.default
         try fm.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         if fm.fileExists(atPath: url.path), !backedUp.contains(url.path) {
-            let bak = url.appendingPathExtension("claude-deck.bak")
+            let bak = url.appendingPathExtension("claudeck.bak")
             try? fm.removeItem(at: bak)
             try? fm.copyItem(at: url, to: bak)
             backedUp.insert(url.path)

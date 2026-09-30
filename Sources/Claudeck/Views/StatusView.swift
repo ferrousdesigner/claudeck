@@ -46,7 +46,7 @@ struct StatusView: View {
 
                 if !runner.runs.isEmpty {
                     HStack {
-                        sectionTitle("Prompts sent from Claude Deck", "paperplane")
+                        sectionTitle("Prompts sent from Claudeck", "paperplane")
                         Spacer()
                         Button("Clear finished") { runner.clearFinished() }.buttonStyle(.link)
                     }

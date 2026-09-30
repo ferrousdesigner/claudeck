@@ -18,9 +18,9 @@ struct GuideTopic: Identifiable, Hashable {
 enum Guide {
     static let topics: [GuideTopic] = [
         GuideTopic(id: "start", title: "Getting started", icon: "flag.checkered",
-                   summary: "Claude Deck is a dashboard for Claude Code on this Mac. It reads the session files Claude Code already keeps in ~/.claude, so there's nothing to connect: open it and your history is there.",
+                   summary: "Claudeck is a dashboard for Claude Code on this Mac. It reads the session files Claude Code already keeps in ~/.claude, so there's nothing to connect: open it and your history is there.",
                    steps: [
-                    "Use Claude Code as usual, in the terminal or in your editor. Claude Deck picks up new sessions within a few seconds.",
+                    "Use Claude Code as usual, in the terminal or in your editor. Claudeck picks up new sessions within a few seconds.",
                     "Watch what's running on **Status**, and read or search past work on **Sessions** and **Search**.",
                     "Press **⌘K** (or the **Ask Claude** button) to send a prompt to Claude Code from anywhere in the app.",
                     "Add MCP servers, plugins, hooks and permissions on **Extensions**, without editing JSON.",
@@ -42,7 +42,7 @@ enum Guide {
                     "Runs keep going if you close the composer. Progress shows on Status and in the menu bar.",
                    ]),
         GuideTopic(id: "status", title: "Status", icon: Tab.status.icon, tab: .status,
-                   summary: "What Claude is doing right now: every running Claude Code session, the prompts you sent from Claude Deck, approvals waiting for you, and today's spend.",
+                   summary: "What Claude is doing right now: every running Claude Code session, the prompts you sent from Claudeck, approvals waiting for you, and today's spend.",
                    steps: [
                     "An **orange dot** means Claude is working. A **green dot** means it's idle and waiting for you.",
                     "The **context meter** shows how full a session's context window is. Near the limit, Claude starts compacting and forgetting detail, so it's a good time to start fresh.",
@@ -51,12 +51,12 @@ enum Guide {
                    ],
                    tips: ["Set a budget in Settings (⌘,) → Budget to see daily, weekly and monthly progress bars here."]),
         GuideTopic(id: "sessions", title: "Sessions & memory docs", icon: Tab.sessions.icon, tab: .sessions,
-                   summary: "Every Claude Code session, newest first. Each one is saved as a readable Markdown memory doc in ~/Documents/Claude Deck/Sessions.",
+                   summary: "Every Claude Code session, newest first. Each one is saved as a readable Markdown memory doc in ~/Documents/Claudeck/Sessions.",
                    steps: [
                     "Pick a session to see its tokens, cost, the tools used and the full conversation.",
                     "An **AI summary** is written the first time you open a session (using Haiku by default) and cached. Click **Regenerate summary** after the session grows.",
                     "**Files changed** lists every file Claude edited, with a diff against the version from before the session and a **Restore original** button.",
-                    "**Continue here** resumes the session from Claude Deck. **Resume in Terminal** resumes it with `claude --resume`.",
+                    "**Continue here** resumes the session from Claudeck. **Resume in Terminal** resumes it with `claude --resume`.",
                     "**Export** saves the session as Markdown, Word or PDF, or shares it.",
                    ],
                    tips: ["Change the memory folder or the summary model in Settings → General."]),
@@ -94,7 +94,7 @@ enum Guide {
                    summary: "Patterns in how you use Claude Code, and an AI-written digest of what you got done.",
                    steps: [
                     "See your busiest hours, the tools Claude uses most, and how often tool calls fail.",
-                    "Click **Generate** for a summary of the last day or week, with a standup blurb you can paste. Digests are saved in ~/Documents/Claude Deck/Digests.",
+                    "Click **Generate** for a summary of the last day or week, with a standup blurb you can paste. Digests are saved in ~/Documents/Claudeck/Digests.",
                    ]),
         GuideTopic(id: "projects", title: "Projects", icon: Tab.projects.icon, tab: .projects,
                    summary: "Every folder you've used Claude Code in, with its git state and the threads left open.",
@@ -117,7 +117,7 @@ enum Guide {
                     "Create a schedule: pick a template, a folder, and when to run it (daily at a time, on chosen weekdays, or every N minutes).",
                     "Scheduled runs show on Status and send a notification when they finish.",
                    ],
-                   tips: ["Schedules only run while Claude Deck is open. Keep it in the menu bar and turn on Open at login (Settings → General)."]),
+                   tips: ["Schedules only run while Claudeck is open. Keep it in the menu bar and turn on Open at login (Settings → General)."]),
         GuideTopic(id: "extensions", title: "Extensions", icon: Tab.extensions.icon, tab: .extensions,
                    summary: "Everything that extends Claude Code, in one place, and editable without touching JSON.",
                    steps: [
@@ -128,14 +128,14 @@ enum Guide {
                     "**Permissions**: allow or deny tools. Risky rules are flagged.",
                     "**CLAUDE.md & memory**: edit your instruction files. References to files that no longer exist are highlighted.",
                    ],
-                   tips: ["Before its first change to a settings file, Claude Deck saves a backup next to it (*.claude-deck.bak)."]),
+                   tips: ["Before its first change to a settings file, Claudeck saves a backup next to it (*.claudeck.bak)."]),
         GuideTopic(id: "menubar", title: "Menu bar & approvals", icon: "menubar.rectangle",
                    summary: "The ✦ icon in the menu bar shows live sessions, today's cost and budget, and approvals waiting for you, even when the window is closed.",
                    steps: [
                     "The icon changes to ✦✦ with a count while Claude is working, and to a speech bubble when it needs permission.",
-                    "To approve Claude's permission prompts from Claude Deck, turn on Settings (⌘,) → Alerts → **Answer Claude's permission prompts here**.",
+                    "To approve Claude's permission prompts from Claudeck, turn on Settings (⌘,) → Alerts → **Answer Claude's permission prompts here**.",
                     "After that, when Claude asks to run a command or edit a file, you get a notification with **Allow** and **Deny**. The request also appears in the menu bar and on Status.",
-                    "If you don't answer within the wait time, or Claude Deck isn't running, the terminal asks you as usual.",
+                    "If you don't answer within the wait time, or Claudeck isn't running, the terminal asks you as usual.",
                    ]),
         GuideTopic(id: "shortcuts", title: "Keyboard shortcuts", icon: "keyboard",
                    summary: "Everything you can do from the keyboard.",
@@ -148,10 +148,10 @@ enum Guide {
                     "**⌘?**: this guide",
                    ]),
         GuideTopic(id: "privacy", title: "Privacy & data", icon: "hand.raised",
-                   summary: "Claude Deck has no server and no account. It reads Claude Code's local files and runs the claude CLI you already have.",
+                   summary: "Claudeck has no server and no account. It reads Claude Code's local files and runs the claude CLI you already have.",
                    steps: [
                     "**Reads**: ~/.claude (sessions, settings, skills, plugins, file history).",
-                    "**Writes**: memory docs and digests in ~/Documents/Claude Deck, app data in ~/Library/Application Support/Claude Deck, and ~/.claude settings only when you change them here.",
+                    "**Writes**: memory docs and digests in ~/Documents/Claudeck, app data in ~/Library/Application Support/Claudeck, and ~/.claude settings only when you change them here.",
                     "**Network**: only the Claude Code runs you start. AI summaries and digests are Claude Code runs too, and they aren't saved as sessions.",
                    ]),
         GuideTopic(id: "troubleshooting", title: "Troubleshooting", icon: "wrench.and.screwdriver",
@@ -159,7 +159,7 @@ enum Guide {
                    steps: [
                     "**No sessions show up**: use Claude Code at least once, then press ⌘R. Sessions are read from ~/.claude/projects.",
                     "**Ask Claude does nothing**: check Settings → General → Claude Code CLI. If it says *Not found*, install Claude Code or make sure `claude` is on your PATH, then reopen the app.",
-                    "**No notifications**: allow Claude Deck in System Settings → Notifications, then use Settings → Alerts → *Send a test notification*.",
+                    "**No notifications**: allow Claudeck in System Settings → Notifications, then use Settings → Alerts → *Send a test notification*.",
                     "**Approvals don't appear**: turn the approval toggle off and on again. It re-writes the hook in ~/.claude/settings.json.",
                     "**Summary failed**: summaries need a signed-in claude CLI. Run `claude` once in Terminal to sign in.",
                    ]),
@@ -309,7 +309,7 @@ struct WalkthroughView: View {
     }
 
     static let pages: [Page] = [
-        Page(icon: "sparkles", title: "Welcome to Claude Deck",
+        Page(icon: "sparkles", title: "Welcome to Claudeck",
              body: "A home for your Claude Code work. See what's running, find anything from past sessions, track cost, and set up MCP servers, plugins and hooks without editing JSON.",
              bullets: ["Works with the Claude Code you already use: terminal, VS Code or JetBrains.", "Reads ~/.claude locally. No account and no server."]),
         Page(icon: Tab.status.icon, title: "Know what Claude is doing", body: "Status shows every running session, whether it's working or waiting for you, how full its context is, and what you've spent today.",
@@ -373,7 +373,7 @@ struct WalkthroughView: View {
                 }
                 Spacer()
                 if page > 0 { Button("Back") { go(page - 1) }.keyboardShortcut(.leftArrow, modifiers: []) }
-                Button(page == Self.pages.count - 1 ? "Start using Claude Deck" : "Next") {
+                Button(page == Self.pages.count - 1 ? "Start using Claudeck" : "Next") {
                     page == Self.pages.count - 1 ? finish() : go(page + 1)
                 }
                 .keyboardShortcut(.defaultAction)
@@ -400,7 +400,7 @@ struct WalkthroughView: View {
     }
 }
 
-/// Last walkthrough page: checks that everything Claude Deck needs is in place and offers the optional settings.
+/// Last walkthrough page: checks that everything Claudeck needs is in place and offers the optional settings.
 struct SetupChecklist: View {
     @EnvironmentObject var sessions: SessionStore
     @EnvironmentObject var bridge: PermissionBridge
@@ -412,14 +412,14 @@ struct SetupChecklist: View {
         VStack(alignment: .leading, spacing: 10) {
             row(ok: Paths.claudeBinary != nil,
                 title: Paths.claudeBinary != nil ? "Claude Code found" : "Claude Code not found",
-                detail: Paths.claudeBinary.map { ($0 as NSString).abbreviatingWithTildeInPath } ?? "Install Claude Code, then reopen Claude Deck. Browsing still works.")
+                detail: Paths.claudeBinary.map { ($0 as NSString).abbreviatingWithTildeInPath } ?? "Install Claude Code, then reopen Claudeck. Browsing still works.")
             row(ok: !sessions.sessions.isEmpty,
                 title: sessions.isLoading ? "Reading your sessions…" : "\(sessions.sessions.count) sessions found",
                 detail: sessions.sessions.isEmpty && !sessions.isLoading ? "Use Claude Code once and they'll appear here." : "Memory docs are saved to \((Paths.memoryDir.path as NSString).abbreviatingWithTildeInPath)")
             HStack {
                 row(ok: notifications == .authorized || notifications == .provisional,
                     title: "Notifications",
-                    detail: notifications == .denied ? "Turned off. Allow Claude Deck in System Settings." : "For finished runs, budgets and approvals.")
+                    detail: notifications == .denied ? "Turned off. Allow Claudeck in System Settings." : "For finished runs, budgets and approvals.")
                 Spacer()
                 if notifications == .denied {
                     Button("Open System Settings") {

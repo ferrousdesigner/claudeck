@@ -99,7 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 @main
-struct ClaudeDeckApp: App {
+struct ClaudeckApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var state = AppState()
     @StateObject private var sessions = SessionStore()
@@ -113,7 +113,7 @@ struct ClaudeDeckApp: App {
         if let i = args.firstIndex(of: "--hook"), i + 1 < args.count { HookMode.run(args[i + 1]) }
         if args.contains("--selftest") { SelfTest.run() }
         if args.contains("--livetest") { LiveTest.run() }
-        // `ClaudeDeck --dump` prints parsed sessions and exits (handy for checking token math).
+        // `Claudeck --dump` prints parsed sessions and exits (handy for checking token math).
         if args.contains("--dump") {
             let (all, _) = SessionWorker().scan()
             for s in all {
@@ -124,7 +124,7 @@ struct ClaudeDeckApp: App {
     }
 
     var body: some Scene {
-        Window("Claude Deck", id: "main") {
+        Window("Claudeck", id: "main") {
             ContentView()
                 .environmentObject(state)
                 .environmentObject(sessions)
@@ -156,7 +156,7 @@ struct ClaudeDeckApp: App {
                 Button("Refresh") { sessions.refresh() }.keyboardShortcut("r", modifiers: .command)
             }
             CommandGroup(replacing: .help) {
-                Button("Claude Deck Guide") { state.openGuide("start") }.keyboardShortcut("?", modifiers: .command)
+                Button("Claudeck Guide") { state.openGuide("start") }.keyboardShortcut("?", modifiers: .command)
                 Button("Help for This Screen") { state.openGuide(Guide.topic(for: state.tab)?.id) }
                 Button("Take the Tour") { state.showWalkthrough = true; AppDelegate.showMainWindow() }
                 Divider()
@@ -165,7 +165,7 @@ struct ClaudeDeckApp: App {
             }
         }
 
-        Window("Claude Deck Guide", id: "guide") {
+        Window("Claudeck Guide", id: "guide") {
             GuideWindow()
                 .environmentObject(state)
         }

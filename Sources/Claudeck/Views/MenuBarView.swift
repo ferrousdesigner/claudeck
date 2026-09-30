@@ -13,7 +13,7 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "sparkles").foregroundStyle(Color.deckAccent)
-                Text("Claude Deck").font(.headline)
+                Text("Claudeck").font(.headline)
                 Spacer()
                 Button { AppDelegate.showMainWindow() } label: { Image(systemName: "macwindow") }.buttonStyle(.borderless).help("Open dashboard")
             }
