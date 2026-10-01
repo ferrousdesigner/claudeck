@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudeck: a Mac dashboard for Claude Code</title>
+<meta name="description" content="See live sessions, search your history, track costs and spend fewer tokens. A native, private app for macOS with no setup.">
+<meta property="og:title" content="Claudeck: a Mac dashboard for Claude Code">
+<meta property="og:description" content="See live sessions, search your history, track costs and spend fewer tokens. A native, private app for macOS with no setup.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="app-icon.svg">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.460.0/font/lucide.css">
+<style>
+/* From the Modernist design system (styles.css), trimmed to what this page uses */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: var(--color-text); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 8px; }
+h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+img { display: block; max-width: 100%; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; text-decoration: none; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 14px; line-height: 1.2; background: transparent; border: 1px solid transparent; padding: 8px 14.4px; border-radius: 0; }
+.btn-primary { background: var(--color-accent); }
+.btn-primary:hover { background: var(--color-accent-600); }
+.btn-primary:active { background: var(--color-accent-700); }
+:root {
+  --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  --font-heading-weight: 700;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --color-bg: #f6f5f4; --color-surface: #ecebe9; --color-text: #1c1b1a;
+  --color-muted: #5f5c59; --color-divider: color-mix(in srgb, #1c1b1a 32%, transparent);
+  --color-accent: #D97757; --color-accent-600: #c6653f; --color-accent-700: #a14e2f; --accent-ink: #a14e2f; --on-accent: #1c1b1a;
+  --app-win: #ffffff; --app-side: #efeeed; --app-card: #f6f6f5; --app-pop: rgba(246,246,246,.92); --app-sep: rgba(0,0,0,.1);
+  --app-text: #1d1d1f; --app-t2: rgba(0,0,0,.52); --app-t3: rgba(0,0,0,.3); --app-q: rgba(0,0,0,.08); --app-sel: rgba(0,0,0,.08);
+  --mac-orange: #ff9500; --mac-green: #28cd41; --mac-red: #ff3b30; --mac-teal: #30b0c7; --mac-blue: #007aff; --mac-purple: #af52de; --hl: rgba(255,204,0,.38);
+  --win-shadow: 0 1px 0 rgba(0,0,0,.04), 0 24px 70px rgba(30,20,10,.22);
+}
+:root[data-theme="dark"] {
+  --color-bg: #151413; --color-surface: #1f1e1d; --color-text: #eeece9; --color-muted: #a8a49f;
+  --color-divider: color-mix(in srgb, #eeece9 30%, transparent); --accent-ink: #eb9b7e; --color-accent-600: #e48a69; --color-accent-700: #eb9b7e;
+  --app-win: #1e1e1e; --app-side: #2a2928; --app-card: #262626; --app-pop: rgba(44,44,44,.9); --app-sep: rgba(255,255,255,.1);
+  --app-text: #f2f2f2; --app-t2: rgba(255,255,255,.55); --app-t3: rgba(255,255,255,.3); --app-q: rgba(255,255,255,.1); --app-sel: rgba(255,255,255,.1);
+  --mac-orange: #ff9f0a; --mac-green: #30d158; --mac-red: #ff453a; --mac-teal: #40c8e0; --mac-blue: #0a84ff; --mac-purple: #bf5af2; --hl: rgba(255,214,10,.3);
+  --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 70px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #151413; --color-surface: #1f1e1d; --color-text: #eeece9; --color-muted: #a8a49f;
+    --color-divider: color-mix(in srgb, #eeece9 30%, transparent); --accent-ink: #eb9b7e; --color-accent-600: #e48a69; --color-accent-700: #eb9b7e;
+    --app-win: #1e1e1e; --app-side: #2a2928; --app-card: #262626; --app-pop: rgba(44,44,44,.9); --app-sep: rgba(255,255,255,.1);
+    --app-text: #f2f2f2; --app-t2: rgba(255,255,255,.55); --app-t3: rgba(255,255,255,.3); --app-q: rgba(255,255,255,.1); --app-sel: rgba(255,255,255,.1);
+    --mac-orange: #ff9f0a; --mac-green: #30d158; --mac-red: #ff453a; --mac-teal: #40c8e0; --mac-blue: #0a84ff; --mac-purple: #bf5af2; --hl: rgba(255,214,10,.3);
+    --win-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 70px rgba(0,0,0,.6);
+  }
+}
+html, body { margin: 0; background: var(--color-bg); }
+a { color: var(--color-text); text-underline-offset: 3px; }
+a:hover { color: var(--accent-ink); }
+.btn, .btn span { white-space: nowrap; }
+@keyframes ckPulse { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes ckSpin { to { transform: rotate(360deg); } }
+
+/* Responsive layout (replaces the design's JS-computed paddings and columns) */
+.pl24, .pw { padding-left: 0; }
+.grid3 { grid-template-columns: 1fr; }
+.grid6 { grid-template-columns: 1fr; }
+.pl32 { padding-left: 0; }
+.pl40 { padding-left: 0; }
+.mobile-bar { display: none; }
+/* Mockups are scaled with transforms, so keep their fixed widths from sizing the layout */
+[data-fit] { min-width: 0; contain: inline-size; }
+@media (max-width: 719px) { .mobile-bar { display: block; } .hdr-dl { display: none !important; } }
+@media (min-width: 760px) {
+  .pl24 { padding-left: 24px; }
+  .grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid6 .pw:nth-child(2n) { padding-left: 24px; }
+}
+@media (min-width: 1040px) {
+  .grid6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid6 .pw:nth-child(2n) { padding-left: 0; }
+  .grid6 .pw:not(:nth-child(3n+1)) { padding-left: 24px; }
+}
+@media (min-width: 892px) { .pl40 { padding-left: 40px; } }
+@media (min-width: 930px) { .pl32 { padding-left: 32px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="page" style="background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); min-height: 100vh; -webkit-font-smoothing: antialiased;">
+
+<header style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 2px solid var(--color-divider);">
+    <a href="#top" style="display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 17px;">
+      <img src="app-icon.svg" alt="" width="30" height="30" style="display: block;">
+      <span>Claudeck</span>
+    </a>
+    <a href="https://github.com/ferrousdesigner/claudeck/blob/main/CHANGELOG.md" style="font-family: var(--font-mono); font-size: 12px; color: var(--color-muted); text-decoration: none;">v1.1.1</a>
+    <div style="flex: 1;"></div>
+    <a href="https://github.com/ferrousdesigner/claudeck" style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; text-decoration: none;"><i class="icon-github" style="font-size: 16px;"></i><span>GitHub</span></a>
+    <a class="btn btn-primary hdr-dl" href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="color: var(--on-accent); font-weight: 700;"><i class="icon-download"></i><span>Download</span></a>
+  </div>
+</header>
+
+<main id="top">
+
+<section data-screen-label="01 Hero" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 64px 32px 48px 0;">
+      <h1 style="font-size: clamp(40px, 6vw, 68px); line-height: 1.02; letter-spacing: -0.035em; margin: 0; text-wrap: balance;">See everything Claude&nbsp;Code is doing.</h1>
+    </div>
+    <div class="pl32" style="background: var(--color-bg); padding-top: 64px; padding-right: 0; padding-bottom: 48px; display: flex; flex-direction: column; justify-content: flex-end; gap: 28px;">
+      <p style="font-size: 19px; line-height: 1.5; margin: 0; max-width: 520px; text-wrap: pretty;">A native Mac dashboard for your sessions, costs and settings. It reads what's already in <code style="font-family: var(--font-mono); font-size: 0.88em; background: var(--color-surface); padding: 1px 5px;">~/.claude</code>, so there's no setup, no account and no server.</p>
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
+          <a class="btn btn-primary" href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="color: var(--on-accent); font-size: 17px; padding: 15px 22px; min-width: 260px; justify-content: space-between; gap: 32px;"><span>Download for macOS</span><i class="icon-arrow-down-to-line" style="font-size: 19px;"></i></a>
+          <a href="https://github.com/ferrousdesigner/claudeck" style="white-space: nowrap; font-size: 15px; font-weight: 600; display: flex; gap: 6px; align-items: center;"><span>View on GitHub</span><i class="icon-arrow-up-right"></i></a>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--color-muted);">Free · 5 MB · macOS 14+ · Apple silicon &amp; Intel</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 56px 0 72px;">
+    <div data-fit="1370" style="width: 100%; overflow: visible;">
+      <div style="width: 1370px; height: 760px; position: relative;">
+        <!-- Status window -->
+        <div style="position: absolute; left: 0; top: 40px; width: 1080px; height: 700px; background: var(--app-win); border-radius: 12px; box-shadow: var(--win-shadow); border: 1px solid var(--app-sep); overflow: hidden; display: flex; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.3; text-align: left;">
+          <div style="width: 220px; background: var(--app-side); border-right: 1px solid var(--app-sep); display: flex; flex-direction: column; padding: 14px 10px 0; flex-shrink: 0;">
+            <div style="display: flex; gap: 8px; padding: 4px 8px 22px;">
+              <span style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f57;"></span>
+              <span style="width: 12px; height: 12px; border-radius: 50%; background: #febc2e;"></span>
+              <span style="width: 12px; height: 12px; border-radius: 50%; background: #28c840;"></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; background: var(--app-sel);"><i class="icon-activity" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span style="flex: 1;">Status</span><span style="color: var(--app-t2); font-size: 12px;">3</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-library" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Sessions</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-search" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Search</span></div>
+            </div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--app-t3); padding: 14px 8px 4px;">Understand</div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-circle-dollar-sign" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Cost &amp; Tokens</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-lightbulb" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Improvements</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-chart-line" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Insights</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-folder" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Projects</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-shield-check" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Security</span></div>
+            </div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--app-t3); padding: 14px 8px 4px;">Automate &amp; configure</div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-book-text" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span style="flex: 1;">Prompts &amp; Schedules</span><span style="color: var(--app-t2); font-size: 12px;">2</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><i class="icon-puzzle" style="color: var(--mac-blue); width: 18px; font-size: 15px;"></i><span>Extensions</span></div>
+            </div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--app-t3); padding: 14px 8px 4px;">Live</div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><span style="position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"><span style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--mac-orange); animation: ckPulse 1.2s ease-out infinite;"></span></span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Migrate auth to session tokens</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><span style="position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"><span style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--mac-orange); animation: ckPulse 1.2s ease-out infinite;"></span></span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Add rate limits to webhooks</span></div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 5px 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--mac-green); flex-shrink: 0;"></span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Fix flaky checkout test</span></div>
+            </div>
+            <div style="flex: 1;"></div>
+            <div style="display: flex; align-items: center; gap: 6px; padding: 10px 2px; color: var(--app-t3); font-size: 11px;"><i class="icon-refresh-cw" style="font-size: 10px;"></i><span style="flex: 1;">Updated 3s ago</span><i class="icon-circle-help" style="color: var(--app-t2); font-size: 12px;"></i><span style="color: var(--app-t2); font-size: 12px;">Guide</span></div>
+          </div>
+          <div style="flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column;">
+            <div style="height: 52px; display: flex; justify-content: flex-end; align-items: center; padding: 0 16px; flex-shrink: 0;"><i class="icon-circle-help" style="color: var(--app-t2); font-size: 16px;"></i></div>
+            <div style="padding: 0 24px 24px; display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; align-items: flex-end;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em;">Current status</div>
+                  <div style="color: var(--app-t2);">Claude is working in 2 sessions</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 6px; background: var(--app-q); font-size: 13px;"><i class="icon-rotate-cw" style="font-size: 12px;"></i><span>Refresh</span></div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-zap"></i><span>Running now</span></div><div style="font-size: 26px; font-weight: 600; color: var(--mac-orange);">3</div><div style="font-size: 10px; color: var(--app-t3);">2 working · 1 idle</div></div>
+                <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-circle-dollar-sign"></i><span>Spent today</span></div><div style="font-size: 26px; font-weight: 600; color: var(--mac-blue);">$14.82</div><div style="font-size: 10px; color: var(--app-t3);">6.1M tokens</div></div>
+                <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-calendar"></i><span>Last 7 days</span></div><div style="font-size: 26px; font-weight: 600; color: var(--mac-blue);">$96.40</div><div style="font-size: 10px; color: var(--app-t3);">38.2M tokens</div></div>
+                <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 6px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-library"></i><span>Sessions today</span></div><div style="font-size: 26px; font-weight: 600; color: var(--mac-blue);">11</div><div style="font-size: 10px; color: var(--app-t3);">1,284 all time</div></div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 3px;"><div style="display: flex; gap: 8px; font-size: 11px; white-space: nowrap;"><span style="flex: 1;">Today budget</span><span style="color: var(--app-t2);">$14.82 of $20.00</span></div><div style="height: 5px; border-radius: 3px; background: var(--app-q);"><div style="width: 74%; height: 100%; border-radius: 3px; background: var(--mac-green);"></div></div></div>
+                <div style="display: flex; flex-direction: column; gap: 3px;"><div style="display: flex; gap: 8px; font-size: 11px; white-space: nowrap;"><span style="flex: 1;">This week budget</span><span style="color: var(--app-t2);">$96.40 of $110.00</span></div><div style="height: 5px; border-radius: 3px; background: var(--app-q);"><div style="width: 88%; height: 100%; border-radius: 3px; background: var(--mac-orange);"></div></div></div>
+              </div>
+              <div style="font-size: 13px; font-weight: 600; display: flex; gap: 6px; align-items: center; padding-top: 4px;"><i class="icon-square-terminal" style="color: var(--mac-blue);"></i><span>Live sessions</span></div>
+              <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--mac-orange);"><span style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--mac-orange); animation: ckPulse 1.2s ease-out infinite;"></span></span>
+                  <span style="font-size: 15px; font-weight: 600;">Migrate auth to session tokens</span>
+                  <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; color: var(--mac-orange); background: color-mix(in srgb, var(--mac-orange) 15%, transparent);">WORKING</span>
+                  <span style="flex: 1;"></span>
+                  <span style="color: var(--app-t2); font-variant-numeric: tabular-nums;">2.4M tokens · $6.12</span>
+                </div>
+                <div style="display: flex; gap: 14px; font-size: 11px; color: var(--app-t2); white-space: nowrap;">
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-folder"></i><span>~/code/acme-web</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-git-branch"></i><span>feat/session-tokens</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-cpu"></i><span>PID 48213</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-timer"></i><span>up 42m</span></span>
+                  <span>v2.1.4</span>
+                </div>
+                <div style="display: flex; gap: 0;"><span style="width: 80px; flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--app-t2);">Last prompt</span><span>Replace the JWT middleware with server-side sessions and update the tests.</span></div>
+                <div style="display: flex; gap: 0;"><span style="width: 80px; flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--app-t2);">Latest</span><span style="opacity: .85;">Updated 14 files. Running the auth test suite now.</span></div>
+                <div style="max-width: 360px; display: flex; flex-direction: column; gap: 3px;"><div style="display: flex; gap: 6px; font-size: 11px; color: var(--app-t2);"><span style="font-weight: 600;">Context</span><span style="font-size: 10px;">118K / 200K</span></div><div style="height: 5px; border-radius: 3px; background: var(--app-q);"><div style="width: 59%; height: 100%; border-radius: 3px; background: var(--mac-green);"></div></div></div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;"><span style="flex: 1; font-size: 10px; color: var(--app-t3);">Status changed 6s ago</span><span style="padding: 2px 8px; border-radius: 5px; background: var(--app-q); white-space: nowrap;">Open in Terminal</span><span style="padding: 2px 8px; border-radius: 5px; background: var(--app-q); white-space: nowrap;">Open memory</span></div>
+              </div>
+              <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--mac-orange);"><span style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--mac-orange); animation: ckPulse 1.2s ease-out infinite;"></span></span>
+                  <span style="font-size: 15px; font-weight: 600;">Add rate limits to webhooks</span>
+                  <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; color: var(--mac-orange); background: color-mix(in srgb, var(--mac-orange) 15%, transparent);">WORKING</span>
+                  <span style="flex: 1;"></span>
+                  <span style="color: var(--app-t2);">3.1M tokens · $7.48</span>
+                </div>
+                <div style="display: flex; gap: 14px; font-size: 11px; color: var(--app-t2); white-space: nowrap;">
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-folder"></i><span>~/code/billing-api</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-git-branch"></i><span>main</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-cpu"></i><span>PID 51907</span></span>
+                  <span style="display: flex; gap: 4px; align-items: center;"><i class="icon-timer"></i><span>up 1h 18m</span></span>
+                </div>
+                <div style="max-width: 360px; display: flex; flex-direction: column; gap: 3px;"><div style="display: flex; gap: 6px; font-size: 11px; color: var(--app-t2);"><span style="font-weight: 600;">Context</span><span style="font-size: 10px;">162K / 200K</span><span style="font-size: 10px; color: var(--mac-orange);">consider /compact</span></div><div style="height: 5px; border-radius: 3px; background: var(--app-q);"><div style="width: 81%; height: 100%; border-radius: 3px; background: var(--mac-orange);"></div></div></div>
+              </div>
+            </div>
+            <div style="position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; color: #fff; padding: 13px 20px; border-radius: 99px; background: linear-gradient(135deg, #D97757, #ba5940); box-shadow: 0 6px 20px rgba(0,0,0,.3); white-space: nowrap;"><i class="icon-sparkles" style="font-size: 17px;"></i><span style="font-size: 14px; font-weight: 600;">Claude is working · Ask more</span><span style="font-family: var(--font-mono); font-size: 11px; opacity: .7; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.18);">⌘K</span></div>
+          </div>
+        </div>
+
+        <!-- menu bar + dropdown -->
+        <div style="position: absolute; right: 0; top: 0; width: 380px; display: flex; flex-direction: column; align-items: flex-end; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.3; text-align: left;">
+          <div style="display: flex; align-items: center; gap: 14px; height: 26px; padding: 0 12px; background: var(--app-pop); backdrop-filter: blur(20px); border-radius: 7px 7px 0 0; font-size: 13px; color: var(--app-t2); border: 1px solid var(--app-sep); border-bottom: 0;">
+            <i class="icon-wifi"></i><i class="icon-battery-full"></i>
+            <span style="display: flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: 4px; background: var(--app-q); color: var(--app-text);"><i class="icon-sparkles"></i><span>2</span></span>
+            <span style="color: var(--app-text);">Thu 10:42</span>
+          </div>
+          <div style="width: 340px; margin-right: 0; padding: 14px; background: var(--app-pop); backdrop-filter: blur(24px); border-radius: 12px 0 12px 12px; border: 1px solid var(--app-sep); box-shadow: 0 20px 50px rgba(0,0,0,.28); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;"><i class="icon-sparkles" style="color: #D97757;"></i><span style="font-weight: 600; flex: 1;">Claudeck</span><i class="icon-app-window" style="color: var(--app-t2);"></i></div>
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1; padding: 8px; border-radius: 8px; background: var(--app-q); display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; color: var(--app-t2);">Today</span><span style="font-size: 15px; font-weight: 600;">$14.82</span><span style="font-size: 10px; color: var(--app-t3);">6.1M tokens</span></div>
+              <div style="flex: 1; padding: 8px; border-radius: 8px; background: var(--app-q); display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; color: var(--app-t2);">7 days</span><span style="font-size: 15px; font-weight: 600;">$96.40</span><span style="font-size: 10px; color: var(--app-t3);">38.2M tokens</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;"><div style="display: flex; gap: 8px; font-size: 11px; white-space: nowrap;"><span style="flex: 1;">This week budget</span><span style="color: var(--app-t2);">$96.40 of $110.00</span></div><div style="height: 4px; border-radius: 2px; background: var(--app-q);"><div style="width: 88%; height: 100%; border-radius: 2px; background: var(--mac-orange);"></div></div></div>
+            <div style="height: 1px; background: var(--app-sep);"></div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--app-t2);">LIVE</div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;"><span style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 500;">Migrate auth to session tokens</span><span style="font-size: 11px; color: var(--app-t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Running the auth test suite now.</span><div style="height: 3px; margin-top: 3px; border-radius: 2px; background: var(--app-q);"><div style="width: 59%; height: 100%; border-radius: 2px; background: var(--mac-green);"></div></div></div><span style="font-size: 10px; color: var(--mac-orange);">working</span></div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;"><span style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 500;">Add rate limits to webhooks</span><span style="font-size: 11px; color: var(--app-t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Writing tests for the token bucket.</span><div style="height: 3px; margin-top: 3px; border-radius: 2px; background: var(--app-q);"><div style="width: 81%; height: 100%; border-radius: 2px; background: var(--mac-orange);"></div></div></div><span style="font-size: 10px; color: var(--mac-orange);">working</span></div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;"><span style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--mac-green); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 500;">Fix flaky checkout test</span><span style="font-size: 11px; color: var(--app-t2);">Done. The retry was masking a race.</span><div style="height: 3px; margin-top: 3px; border-radius: 2px; background: var(--app-q);"><div style="width: 22%; height: 100%; border-radius: 2px; background: var(--mac-green);"></div></div></div><span style="font-size: 10px; color: var(--mac-green);">idle</span></div>
+            <div style="height: 1px; background: var(--app-sep);"></div>
+            <div style="display: flex; align-items: center;"><span style="display: flex; gap: 5px; align-items: center; padding: 4px 10px; border-radius: 6px; background: #D97757; color: #fff; font-weight: 500;"><i class="icon-sparkle"></i><span>Ask Claude</span></span><span style="flex: 1;"></span><span style="color: var(--app-t2);">Quit</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="02 Proof" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 12px 32px; padding: 18px 0; border-top: 2px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-user-x" style="color: var(--color-accent);"></i><span>No account</span></div>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-eye-off" style="color: var(--color-accent);"></i><span>No telemetry</span></div>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-wifi-off" style="color: var(--color-accent);"></i><span>No network calls of its own</span></div>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-scale" style="color: var(--color-accent);"></i><span>Open source (MIT)</span></div>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-bird" style="color: var(--color-accent);"></i><span>Native SwiftUI</span></div>
+    <div style="display: flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 14px; font-weight: 600;"><i class="icon-package-x" style="color: var(--color-accent);"></i><span>No dependencies</span></div>
+  </div>
+</section>
+
+<section data-screen-label="03 Already set up" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 72px 40px 72px 0; display: flex; flex-direction: column; gap: 20px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Already set up</h6>
+      <h2 style="font-size: clamp(32px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.03em; margin: 0;">Open it. Months of sessions are already there.</h2>
+      <p style="font-size: 17px; line-height: 1.55; margin: 0; max-width: 460px; color: var(--color-muted); text-wrap: pretty;">Claude Code saves every session. Claudeck reads them. New sessions show up within seconds, whether you run Claude in the terminal or in your editor.</p>
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="font-weight: 700; display: flex; gap: 6px; align-items: center; color: var(--accent-ink);"><span>Download for macOS</span><i class="icon-arrow-right"></i></a>
+    </div>
+    <div style="background: var(--color-surface); padding: 48px 32px; display: flex; align-items: center;">
+      <div data-fit="560" style="width: 100%;">
+        <div style="width: 560px; height: 452px; background: var(--app-win); border-radius: 12px; box-shadow: var(--win-shadow); border: 1px solid var(--app-sep); overflow: hidden; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.3; position: relative; text-align: left;">
+          <div style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--app-sep);">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f57;"></span><span style="width: 12px; height: 12px; border-radius: 50%; background: #febc2e;"></span><span style="width: 12px; height: 12px; border-radius: 50%; background: #28c840;"></span>
+          </div>
+          <div style="padding: 18px 20px 10px; display: flex; flex-direction: column; gap: 3px;">
+            <div style="font-size: 22px; font-weight: 700;">Sessions</div>
+            <div style="color: var(--app-t2); font-size: 12px; min-height: 16px;" id="ck-caption"></div>
+          </div>
+          <div style="margin: 0 20px; border-radius: 12px; background: var(--app-card); overflow: hidden;">
+            <div id="ck-new" style="max-height: 0; opacity: 0; overflow: hidden; transition: max-height .45s ease, opacity .45s ease;">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--app-sep); background: color-mix(in srgb, var(--mac-orange) 8%, transparent);">
+                <span style="position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"><span style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--mac-orange); animation: ckPulse 1.2s ease-out infinite;"></span></span>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0;"><span style="font-weight: 500;">Add dark mode to settings page</span><span style="font-size: 11px; color: var(--app-t2);">acme-web · main · 1 prompts</span></div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px; white-space: nowrap; flex-shrink: 0;"><span style="font-weight: 500;">48K</span><span style="font-size: 11px; color: var(--app-t2);">just now</span></div>
+              </div>
+            </div>
+            <div id="ck-rows"></div>
+          </div>
+          <div id="ck-load" style="position: absolute; inset: 44px 0 0; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity .3s; pointer-events: none;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px; background: var(--app-pop); border: 1px solid var(--app-sep); box-shadow: 0 8px 24px rgba(0,0,0,.12);">
+              <span style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--app-q); border-top-color: var(--app-t2); animation: ckSpin .8s linear infinite;"></span>
+              <span>Reading your Claude Code history…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COST -->
+<section data-screen-label="04 Cost" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 72px 40px 72px 0; display: flex; flex-direction: column; gap: 20px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Cost</h6>
+      <h2 style="font-size: clamp(32px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.03em; margin: 0;">See where your tokens go and how to spend fewer.</h2>
+      <p style="font-size: 17px; line-height: 1.55; margin: 0; max-width: 460px; color: var(--color-muted); text-wrap: pretty;">The Improvements tab reads your last 30 days and ranks what to change: lighter models for quick tasks, fresh sessions, cache misses, startup context. Each one comes with an estimated monthly saving. Set daily, weekly or monthly budgets and get a notification at 80% and 100%.</p>
+      <p style="font-size: 13px; line-height: 1.5; margin: 0; max-width: 460px; color: var(--color-muted);">Costs are estimated at API list prices. On Pro or Max you aren't billed per token, so read them as how hard you're using your plan.</p>
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="font-weight: 700; display: flex; gap: 6px; align-items: center; color: var(--accent-ink);"><span>Download for macOS</span><i class="icon-arrow-right"></i></a>
+    </div>
+    <div style="background: var(--color-surface); padding: 48px 32px; display: flex; align-items: center;">
+      <div data-fit="600" style="width: 100%;">
+        <div style="width: 600px; background: var(--app-win); border-radius: 12px; box-shadow: var(--win-shadow); border: 1px solid var(--app-sep); overflow: hidden; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.35; text-align: left; padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 24px; font-weight: 700;">Improvements</div>
+            <div style="font-size: 12px; color: var(--app-t2);">Where your tokens go and what to change to use fewer, based on sessions from the last 30 days. Savings are estimates at API list prices.</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-leaf"></i><span>Potential savings</span></div><div style="font-size: 24px; font-weight: 600; color: var(--mac-green);">$84.20</div><div style="font-size: 10px; color: var(--app-t3);">about 27% of $312.50 in 30 days</div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;"><div style="font-size: 11px; color: var(--app-t2); display: flex; gap: 5px; align-items: center; white-space: nowrap;"><i class="icon-memory-stick"></i><span>Cache hit rate</span></div><div style="font-size: 24px; font-weight: 600; color: var(--mac-orange);">78%</div><div style="font-size: 10px; color: var(--app-t3);">context read from cache</div></div>
+          </div>
+          <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: baseline; gap: 10px;">
+              <i class="icon-rabbit" style="color: var(--mac-orange); width: 20px;"></i>
+              <span style="font-weight: 600; white-space: nowrap;">Use a lighter model for quick tasks</span>
+              <span style="font-size: 10px; font-weight: 600; white-space: nowrap; padding: 2px 7px; border-radius: 99px; color: var(--mac-orange); background: color-mix(in srgb, var(--mac-orange) 15%, transparent);">Medium impact</span>
+              <span style="flex: 1;"></span>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; flex-shrink: 0;"><span style="font-size: 16px; font-weight: 600; color: var(--mac-green);">~$38.60</span><span style="font-size: 10px; color: var(--app-t3);">per month</span></div>
+            </div>
+            <div style="font-size: 12px;">23 short sessions (8 or fewer tool calls) ran on a top-tier model. On Sonnet they would have cost about $38.60 less.</div>
+            <div style="display: flex; gap: 8px; font-size: 12px; align-items: baseline;"><i class="icon-circle-check" style="color: #D97757; font-size: 11px;"></i><span>Switch with <code style="font-family: var(--font-mono); font-size: 11px;">/model sonnet</code> before quick questions, and switch back for hard problems.</span></div>
+          </div>
+          <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: baseline; gap: 10px;">
+              <i class="icon-rotate-ccw" style="color: var(--mac-orange); width: 20px;"></i>
+              <span style="font-weight: 600; white-space: nowrap;">Start fresh sessions more often</span>
+              <span style="font-size: 10px; font-weight: 600; white-space: nowrap; padding: 2px 7px; border-radius: 99px; color: var(--mac-orange); background: color-mix(in srgb, var(--mac-orange) 15%, transparent);">Medium impact</span>
+              <span style="flex: 1;"></span>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; flex-shrink: 0;"><span style="font-size: 16px; font-weight: 600; color: var(--mac-green);">~$27.10</span><span style="font-size: 10px; color: var(--app-t3);">per month</span></div>
+            </div>
+            <div style="font-size: 12px;">6 sessions averaged more than 80K tokens of context on every reply. Clearing between tasks could save about $27.10.</div>
+            <div style="display: flex; font-size: 12px; white-space: nowrap;"><span style="color: var(--mac-blue);">Show 6 sessions</span><span style="flex: 1;"></span><span style="padding: 2px 8px; border-radius: 5px; background: var(--app-q); font-size: 11px;">Open Status</span></div>
+          </div>
+          <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px;">
+            <i class="icon-package" style="color: var(--mac-orange); width: 20px;"></i>
+            <span style="font-weight: 600;">Trim what loads into every session</span>
+            <span style="flex: 1;"></span>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; flex-shrink: 0;"><span style="font-size: 16px; font-weight: 600; color: var(--mac-green);">~$11.90</span><span style="font-size: 10px; color: var(--app-t3);">per month</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE -->
+<section data-screen-label="05 Live" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-surface); padding: 48px 32px; display: flex; align-items: center;">
+      <div data-fit="560" style="width: 100%;">
+        <div style="width: 560px; height: 430px; position: relative; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.3; text-align: left;">
+          <div style="position: absolute; top: 0; left: 0; width: 360px; display: flex; gap: 12px; padding: 12px 14px; border-radius: 16px; background: var(--app-pop); backdrop-filter: blur(24px); border: 1px solid var(--app-sep); box-shadow: 0 12px 36px rgba(0,0,0,.2);">
+            <img src="app-icon.svg" alt="" width="38" height="38" style="display: block; flex-shrink: 0; margin: -3px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+              <div style="display: flex; font-size: 13px;"><span style="font-weight: 600; flex: 1;">Claude wants to use Bash</span><span style="font-size: 11px; color: var(--app-t2);">now</span></div>
+              <span style="font-weight: 500;">acme-web</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--app-t2);">npm run db:migrate -- --env=staging</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1px; margin: -12px -14px -12px 0; border-left: 1px solid var(--app-sep); width: 72px;">
+              <span style="flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; border-bottom: 1px solid var(--app-sep);">Allow</span>
+              <span style="flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 500; color: var(--mac-red);">Deny</span>
+            </div>
+          </div>
+          <div style="position: absolute; right: 0; top: 70px; width: 340px; padding: 14px; background: var(--app-pop); backdrop-filter: blur(24px); border-radius: 12px; border: 1px solid var(--app-sep); box-shadow: 0 20px 50px rgba(0,0,0,.26); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;"><i class="icon-sparkles" style="color: #D97757;"></i><span style="font-weight: 600; flex: 1;">Claudeck</span><i class="icon-app-window" style="color: var(--app-t2);"></i></div>
+            <div style="padding: 10px; border-radius: 10px; background: color-mix(in srgb, var(--mac-orange) 10%, transparent); border: 1px solid color-mix(in srgb, var(--mac-orange) 40%, transparent); display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px;"><i class="icon-hand" style="color: var(--mac-orange);"></i><span style="font-weight: 600; flex: 1;">Claude wants to use Bash</span><span style="font-size: 11px; color: var(--app-t2);">47s</span></div>
+              <div style="font-family: var(--font-mono); font-size: 11px; padding: 6px; border-radius: 6px; background: color-mix(in srgb, var(--app-win) 60%, transparent);">npm run db:migrate -- --env=staging</div>
+              <div style="display: flex; align-items: center; gap: 6px;"><span style="flex: 1; font-size: 11px; color: var(--app-t2);">Migrate auth to session tokens</span><span style="padding: 2px 9px; border-radius: 5px; background: var(--app-q); color: var(--mac-red);">Deny</span><span style="padding: 2px 9px; border-radius: 5px; background: var(--mac-green); color: #fff; font-weight: 500;">Allow</span></div>
+            </div>
+            <div style="height: 1px; background: var(--app-sep);"></div>
+            <div style="font-size: 10px; font-weight: 700; color: var(--app-t2);">LIVE</div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;"><span style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--mac-orange); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500;">Migrate auth to session tokens</span><span style="font-size: 11px; color: var(--app-t2);">Waiting for approval</span><div style="display: flex; font-size: 10px; color: var(--app-t2); padding-top: 2px;"><span>118K / 200K</span></div><div style="height: 3px; border-radius: 2px; background: var(--app-q);"><div style="width: 59%; height: 100%; border-radius: 2px; background: var(--mac-green);"></div></div></div><span style="font-size: 10px; color: var(--mac-orange);">working</span></div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;"><span style="width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--mac-green); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 500;">Add rate limits to webhooks</span><span style="font-size: 11px; color: var(--app-t2);">All 42 tests pass.</span><div style="display: flex; font-size: 10px; color: var(--app-t2); padding-top: 2px;"><span>162K / 200K</span><span style="margin-left: 6px; color: var(--mac-orange);">consider /compact</span></div><div style="height: 3px; border-radius: 2px; background: var(--app-q);"><div style="width: 81%; height: 100%; border-radius: 2px; background: var(--mac-orange);"></div></div></div><span style="font-size: 10px; color: var(--mac-green);">idle</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pl40" style="background: var(--color-bg); padding-top: 72px; padding-right: 0; padding-bottom: 72px; display: flex; flex-direction: column; gap: 20px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Live</h6>
+      <h2 style="font-size: clamp(32px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.03em; margin: 0;">Know what's running.</h2>
+      <p style="font-size: 17px; line-height: 1.55; margin: 0; max-width: 460px; color: var(--color-muted); text-wrap: pretty;">Every session shows working or idle, and a context meter tells you when to <code style="font-family: var(--font-mono); font-size: 0.88em;">/compact</code>. The ✦ in the menu bar keeps it all one click away, even with the window closed. Turn on approvals and answer "can I run this?" from a notification. Ignore it and the terminal asks as usual.</p>
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="font-weight: 700; display: flex; gap: 6px; align-items: center; color: var(--accent-ink);"><span>Download for macOS</span><i class="icon-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section data-screen-label="06 History" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 72px 40px 72px 0; display: flex; flex-direction: column; gap: 20px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">History</h6>
+      <h2 style="font-size: clamp(32px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.03em; margin: 0;">Find any session again.</h2>
+      <p style="font-size: 17px; line-height: 1.55; margin: 0; max-width: 460px; color: var(--color-muted); text-wrap: pretty;">Press <kbd style="font-family: var(--font-mono); font-size: 0.85em; padding: 1px 6px; border: 1px solid var(--color-divider); color: var(--color-text);">⇧⌘F</kbd> to search every prompt, reply and command across all projects. Each session gets an AI summary, file diffs with Restore original, and a Resume in Terminal button that runs <code style="font-family: var(--font-mono); font-size: 0.88em;">claude --resume</code>.</p>
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="font-weight: 700; display: flex; gap: 6px; align-items: center; color: var(--accent-ink);"><span>Download for macOS</span><i class="icon-arrow-right"></i></a>
+    </div>
+    <div style="background: var(--color-surface); padding: 48px 32px; display: flex; align-items: center;">
+      <div data-fit="600" style="width: 100%;">
+        <div style="width: 600px; background: var(--app-win); border-radius: 12px; box-shadow: var(--win-shadow); border: 1px solid var(--app-sep); overflow: hidden; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.35; text-align: left;">
+          <div style="padding: 22px 22px 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="font-size: 24px; font-weight: 700;">Search every session</div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--app-card); border: 1px solid var(--app-sep);"><i class="icon-search" style="color: var(--app-t2);"></i><span style="font-size: 15px; flex: 1;">rate limit</span></div>
+            <div style="display: flex; align-items: center;">
+              <div style="display: flex; padding: 2px; border-radius: 7px; background: var(--app-q); font-size: 12px;">
+                <span style="padding: 2px 14px; border-radius: 5px; background: var(--app-win); box-shadow: 0 1px 2px rgba(0,0,0,.15);">All</span><span style="padding: 2px 14px;">You</span><span style="padding: 2px 14px;">Claude</span><span style="padding: 2px 14px;">Tools</span>
+              </div>
+              <span style="flex: 1;"></span>
+              <span style="font-size: 11px; color: var(--app-t2); white-space: nowrap;">1,284 sessions indexed · 17 matches</span>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--app-sep);">
+            <div style="display: flex; gap: 8px; padding: 8px 22px; background: var(--app-card); font-size: 12px; white-space: nowrap;"><span style="font-weight: 600;">Add rate limits to webhooks</span><span style="color: var(--app-t2); flex: 1;">billing-api</span><span style="color: var(--app-t2);">2h ago</span></div>
+            <div style="display: flex; gap: 10px; padding: 8px 22px;"><i class="icon-user" style="color: var(--mac-blue); width: 18px;"></i><div style="display: flex; flex-direction: column; gap: 2px;"><span>Add a per-customer <b style="background: var(--hl);">rate</b> <b style="background: var(--hl);">limit</b> to the Stripe webhook handler. 100 req/min, 429 with Retry-After.</span><span style="font-size: 10px; color: var(--app-t3);">Oct 1, 2026 at 8:24 AM</span></div></div>
+            <div style="display: flex; gap: 10px; padding: 8px 22px;"><i class="icon-hammer" style="color: var(--app-t2); width: 18px;"></i><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 12px;">grep -rn "<b style="background: var(--hl);">rate</b>Limit" src/webhooks</span><span style="font-size: 10px; color: var(--app-t3);">Oct 1, 2026 at 8:25 AM</span></div></div>
+            <div style="display: flex; gap: 8px; padding: 8px 22px; background: var(--app-card); font-size: 12px; white-space: nowrap;"><span style="font-weight: 600;">Cache GitHub API responses</span><span style="color: var(--app-t2); flex: 1;">acme-web</span><span style="color: var(--app-t2);">3w ago</span></div>
+            <div style="display: flex; gap: 10px; padding: 8px 22px 18px;"><i class="icon-sparkle" style="color: #D97757; width: 18px;"></i><div style="display: flex; flex-direction: column; gap: 2px;"><span>We were hitting the secondary <b style="background: var(--hl);">rate</b> <b style="background: var(--hl);">limit</b> because every page load fetched the repo list. I added a 5-minute cache keyed by org.</span><span style="font-size: 10px; color: var(--app-t3);">Sep 9, 2026 at 4:51 PM</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROL -->
+<section data-screen-label="07 Control" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 2px; background: var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-surface); padding: 48px 32px; display: flex; align-items: center;">
+      <div data-fit="600" style="width: 100%;">
+        <div style="width: 600px; background: var(--app-win); border-radius: 12px; box-shadow: var(--win-shadow); border: 1px solid var(--app-sep); overflow: hidden; font-family: var(--font-body); color: var(--app-text); font-size: 13px; line-height: 1.35; text-align: left; padding: 22px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-size: 24px; font-weight: 700;">Extensions</div>
+          <div style="display: flex; padding: 2px; border-radius: 7px; background: var(--app-q); font-size: 12px; align-self: flex-start;">
+            <span style="padding: 2px 12px; white-space: nowrap;">Skills</span><span style="padding: 2px 12px; white-space: nowrap;">Plugins</span><span style="padding: 2px 12px; white-space: nowrap;">MCP</span><span style="padding: 2px 12px; white-space: nowrap;">Agents &amp; commands</span><span style="padding: 2px 12px; border-radius: 5px; background: var(--app-win); box-shadow: 0 1px 2px rgba(0,0,0,.15);">Hooks</span>
+          </div>
+          <div style="font-size: 12px; color: var(--app-t2);">Hooks run your own shell commands at points in Claude's work, e.g. after every edit. The command gets details as JSON on stdin; exit code 2 blocks the action and shows Claude your stderr.</div>
+          <div style="font-weight: 600;">Recipes</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><span style="font-weight: 600;">Format after edits</span><span style="font-size: 11px; color: var(--app-t2);">Run Prettier on every file Claude writes or edits.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q);">Add</span></div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><span style="font-weight: 600;">Block rm -rf</span><span style="font-size: 11px; color: var(--app-t2);">Stop any shell command containing rm -rf before it runs.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q);">Add</span></div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><div style="display: flex;"><span style="font-weight: 600; flex: 1;">Protect .env files</span><span style="font-size: 10px; padding: 1px 6px; border-radius: 4px; color: var(--mac-green); background: color-mix(in srgb, var(--mac-green) 15%, transparent);">on</span></div><span style="font-size: 11px; color: var(--app-t2);">Refuse edits to .env and secrets files.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q); opacity: .45;">Added</span></div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><div style="display: flex;"><span style="font-weight: 600; flex: 1;">Say when done</span><span style="font-size: 10px; padding: 1px 6px; border-radius: 4px; color: var(--mac-green); background: color-mix(in srgb, var(--mac-green) 15%, transparent);">on</span></div><span style="font-size: 11px; color: var(--app-t2);">Speak “Claude is done” when a reply finishes.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q); opacity: .45;">Added</span></div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><span style="font-weight: 600;">Lint before commit</span><span style="font-size: 11px; color: var(--app-t2);">Run npm run lint before any git commit Claude makes.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q);">Add</span></div></div>
+            <div style="background: var(--app-card); border: 1px solid var(--app-sep); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px;"><span style="font-weight: 600;">Log every command</span><span style="font-size: 11px; color: var(--app-t2);">Append each shell command to ~/.claude/bash-log.txt.</span><div style="display: flex; align-items: center; font-size: 11px;"><span style="color: var(--mac-blue); flex: 1;">Customize</span><span style="padding: 1px 9px; border-radius: 5px; background: var(--app-q);">Add</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pl40" style="background: var(--color-bg); padding-top: 72px; padding-right: 0; padding-bottom: 72px; display: flex; flex-direction: column; gap: 20px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Control</h6>
+      <h2 style="font-size: clamp(32px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.03em; margin: 0;">Change settings without editing JSON.</h2>
+      <p style="font-size: 17px; line-height: 1.55; margin: 0; max-width: 460px; color: var(--color-muted); text-wrap: pretty;">MCP servers, hooks, permissions, plugins, skills and CLAUDE.md, all from forms and ready-made recipes. Before its first change to a settings file, Claudeck saves a backup next to it as <code style="font-family: var(--font-mono); font-size: 0.88em;">*.claudeck.bak</code>.</p>
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="font-weight: 700; display: flex; gap: 6px; align-items: center; color: var(--accent-ink);"><span>Download for macOS</span><i class="icon-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="08 Power users" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 0;">
+  <h2 style="font-size: clamp(28px, 3.4vw, 36px); letter-spacing: -0.025em; margin: 0 0 28px;">And for heavier use</h2>
+  <div class="grid6" style="display: grid; gap: 2px; background: var(--color-divider); border-top: 2px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center;"><i class="icon-sparkle" style="font-size: 22px; color: var(--color-accent);"></i><kbd style="font-family: var(--font-mono); font-size: 12px; color: var(--color-muted);">⌘K</kbd></div><div style="font-weight: 700; font-size: 16px;">Ask Claude</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Send a prompt to your local <code style="font-family: var(--font-mono); font-size: 0.9em;">claude</code> in any project. Pick the model and permission mode.</div></div>
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><i class="icon-git-compare" style="font-size: 22px; color: var(--color-accent);"></i><div style="font-weight: 700; font-size: 16px;">Parallel attempts</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Run 2–4 attempts in separate git worktrees and compare the diffs side by side.</div></div>
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><i class="icon-alarm-clock" style="font-size: 22px; color: var(--color-accent);"></i><div style="font-weight: 700; font-size: 16px;">Scheduled prompts</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Save prompts you reuse. Run them daily, on chosen weekdays, or every N minutes.</div></div>
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><i class="icon-shield-alert" style="font-size: 22px; color: var(--color-accent);"></i><div style="font-weight: 700; font-size: 16px;">Secret-leak scanner</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Finds API keys, tokens and database URLs that ended up in Claude's context. Values stay masked.</div></div>
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><i class="icon-file-down" style="font-size: 22px; color: var(--color-accent);"></i><div style="font-weight: 700; font-size: 16px;">Export</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Any session to Markdown, Word or PDF.</div></div>
+    <div class="pw" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 10px;"><i class="icon-newspaper" style="font-size: 22px; color: var(--color-accent);"></i><div style="font-weight: 700; font-size: 16px;">Daily and weekly digest</div><div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">What you shipped, plus a standup blurb you can paste.</div></div>
+  </div>
+</section>
+
+<section data-screen-label="09 Privacy" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 0;">
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 32px; margin-bottom: 28px;">
+    <h2 style="font-size: clamp(28px, 3.4vw, 36px); letter-spacing: -0.025em; margin: 0; flex: 1 1 auto; max-width: 100%;">Everything it touches.</h2>
+    <p style="margin: 0; font-size: 15px; color: var(--color-muted);">Claudeck has no backend. This is the full list.</p>
+  </div>
+  <div class="grid3" style="display: grid; gap: 2px; background: var(--color-divider); border-top: 2px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 24px 24px 28px 0; display: flex; flex-direction: column; gap: 14px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Reads</h6>
+      <code style="font-family: var(--font-mono); font-size: 14px; font-weight: 600;">~/.claude</code>
+      <div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Sessions, settings, skills, plugins and file history.</div>
+    </div>
+    <div class="pl24" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 14px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Writes</h6>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.45;">
+        <div><code style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">~/Documents/Claudeck</code><div style="color: var(--color-muted);">Memory docs and digests.</div></div>
+        <div><code style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">~/Library/Application Support/Claudeck</code><div style="color: var(--color-muted);">App data.</div></div>
+        <div><code style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">~/.claude</code><div style="color: var(--color-muted);">Settings, only when you change something. A <code style="font-family: var(--font-mono); font-size: 0.92em;">*.claudeck.bak</code> backup is saved first.</div></div>
+      </div>
+    </div>
+    <div class="pl24" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 14px;">
+      <h6 style="margin: 0; color: var(--accent-ink);">Network</h6>
+      <div style="font-size: 20px; font-weight: 700;">None of its own.</div>
+      <div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">The only traffic comes from Claude Code runs you start. AI summaries and digests count as those runs, and they aren't saved as sessions.</div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="10 Install" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 72px;">
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 32px; margin-bottom: 28px;">
+    <h2 style="font-size: clamp(28px, 3.4vw, 36px); letter-spacing: -0.025em; margin: 0; flex: 1 1 auto; max-width: 100%;">Install in under a minute.</h2>
+    <a href="https://github.com/ferrousdesigner/claudeck/blob/main/CHANGELOG.md" style="font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);">v1.1.1 · changelog</a>
+  </div>
+  <div class="grid3" style="display: grid; gap: 2px; background: var(--color-divider); border-top: 2px solid var(--color-divider); border-bottom: 2px solid var(--color-divider);">
+    <div style="background: var(--color-bg); padding: 24px 24px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 56px; font-weight: 700; line-height: 1; color: var(--color-accent); letter-spacing: -0.04em;">1</div>
+      <div style="font-weight: 700; font-size: 18px;">Download the .dmg.</div>
+      <div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">One universal build for Apple silicon and Intel, about 5 MB.</div>
+      <a class="btn btn-primary" href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="color: var(--on-accent); align-self: flex-start; justify-content: space-between; gap: 24px; min-width: 220px;"><span>Claudeck.dmg</span><i class="icon-arrow-down-to-line"></i></a>
+    </div>
+    <div class="pl24" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 56px; font-weight: 700; line-height: 1; color: var(--color-accent); letter-spacing: -0.04em;">2</div>
+      <div style="font-weight: 700; font-size: 18px;">Drag Claudeck into Applications.</div>
+      <div style="font-size: 14px; color: var(--color-muted); line-height: 1.5;">Open the .dmg and drop the app on the Applications folder.</div>
+    </div>
+    <div class="pl24" style="background: var(--color-bg); padding-top: 24px; padding-right: 24px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 56px; font-weight: 700; line-height: 1; color: var(--color-accent); letter-spacing: -0.04em;">3</div>
+      <div style="font-weight: 700; font-size: 18px;">The first time, right-click the app and choose Open.</div>
+      <div style="font-size: 14px; color: var(--color-muted); line-height: 1.5; text-wrap: pretty;">Claudeck is ad-hoc signed but not notarized yet, so macOS says it can't verify the developer. Right-click, choose <b style="color: var(--color-text);">Open</b>, then <b style="color: var(--color-text);">Open</b> again. On macOS 15 and later, go to <b style="color: var(--color-text);">System Settings → Privacy &amp; Security</b> and click <b style="color: var(--color-text);">Open Anyway</b>. You only do this once.</div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="11 Final CTA" style="background: var(--color-accent); color: var(--on-accent);">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 96px 24px 88px; display: flex; flex-direction: column; gap: 36px;">
+    <h2 style="font-size: clamp(44px, 7.5vw, 96px); line-height: 0.98; letter-spacing: -0.045em; margin: 0; color: var(--on-accent); max-width: 980px;">Your history's already there. Open it.</h2>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px 28px; border-top: 2px solid var(--on-accent); padding-top: 28px;">
+      <a href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="display: inline-flex; align-items: center; justify-content: space-between; gap: 32px; min-width: 280px; white-space: nowrap; padding: 16px 22px; background: var(--on-accent); color: #D97757; font-weight: 700; font-size: 17px; text-decoration: none;"><span>Download for macOS</span><i class="icon-arrow-down-to-line" style="font-size: 19px;"></i></a>
+      <span style="font-family: var(--font-mono); font-size: 13px;">Free · 5 MB · macOS 14+ · Apple silicon &amp; Intel</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer style="max-width: 1200px; margin: 0 auto; padding: 28px 24px 96px; display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: baseline; font-size: 13px;">
+  <a href="https://github.com/ferrousdesigner/claudeck">GitHub</a>
+  <a href="https://github.com/ferrousdesigner/claudeck/blob/main/CHANGELOG.md">Changelog</a>
+  <a href="https://github.com/ferrousdesigner/claudeck/blob/main/LICENSE">License</a>
+  <span style="flex: 1 1 320px; color: var(--color-muted); line-height: 1.5;">Not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic.</span>
+</footer>
+
+<div class="mobile-bar" style="position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--color-bg); border-top: 2px solid var(--color-divider); z-index: 50;">
+    <a class="btn btn-primary" href="https://github.com/ferrousdesigner/claudeck/raw/main/download/Claudeck.dmg" style="color: var(--on-accent); width: 100%; justify-content: space-between; padding: 14px 18px; font-size: 16px; min-height: 48px;"><span>Download for macOS</span><i class="icon-arrow-down-to-line"></i></a>
+</div>
+</div>
+<script>
+(() => {
+  // Scale the fixed-size app mockups down to fit their column.
+  const fit = () => document.querySelectorAll('[data-fit]').forEach(el => {
+    const c = el.firstElementChild; if (!c) return;
+    const s = Math.min(1, el.clientWidth / +el.dataset.fit);
+    c.style.transformOrigin = 'top left'; c.style.transform = `scale(${s})`;
+    el.style.height = (c.offsetHeight * s) + 'px';
+  });
+  const ro = new ResizeObserver(fit);
+  document.querySelectorAll('[data-fit]').forEach(el => ro.observe(el));
+  window.addEventListener('load', fit); fit();
+
+  // "Already set up": history loads in, then a new live session appears.
+  const rows = [
+    ['Fix flaky checkout test', 'billing-api · fix/checkout-retry · 9 prompts', '412K', '3h ago'],
+    ['Migrate auth to session tokens', 'acme-web · feat/session-tokens · 22 prompts', '2.4M', 'yesterday'],
+    ['Write the v2 webhook docs', 'docs-site · main · 6 prompts', '188K', '2d ago'],
+    ['Bump Terraform providers', 'infra · chore/providers · 4 prompts', '96K', '3d ago'],
+    ['Offline mode for the cart screen', 'mobile-app · feat/offline-cart · 31 prompts', '3.8M', '5d ago'],
+    ['Cache GitHub API responses', 'acme-web · perf/gh-cache · 12 prompts', '640K', '3w ago'],
+    ['Set up the monorepo', 'acme-web · main · 48 prompts', '5.2M', '4mo ago'],
+  ];
+  const list = document.getElementById('ck-rows');
+  const rowEls = rows.map(([title, meta, tokens, ago]) => {
+    const r = document.createElement('div');
+    r.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--app-sep); opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease;';
+    r.innerHTML = `<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--app-q); flex-shrink: 0;"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0;"><span style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span><span style="font-size: 11px; color: var(--app-t2);"></span></div><div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px; white-space: nowrap; flex-shrink: 0;"><span style="font-weight: 500;"></span><span style="font-size: 11px; color: var(--app-t2);"></span></div>`;
+    const s = r.querySelectorAll('span');
+    s[1].textContent = title; s[2].textContent = meta; s[3].textContent = tokens; s[4].textContent = ago;
+    list.appendChild(r); return r;
+  });
+  const cap = document.getElementById('ck-caption'), fresh = document.getElementById('ck-new'), load = document.getElementById('ck-load');
+  const render = t => {
+    const shown = Math.max(0, Math.min(rows.length, t - 3));
+    load.style.opacity = t < 4 ? 1 : 0;
+    cap.textContent = t < 4 ? '' : t >= 16 ? '1,285 sessions · 46 projects · 1 live' : '1,284 sessions · 46 projects';
+    fresh.style.maxHeight = (t >= 16 ? 60 : 0) + 'px'; fresh.style.opacity = t >= 16 ? 1 : 0;
+    rowEls.forEach((r, i) => { r.style.opacity = i < shown ? 1 : 0; r.style.transform = `translateY(${i < shown ? 0 : 8}px)`; });
+    fit();
+  };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { render(16); return; }
+  let tick = 0; render(0);
+  setInterval(() => render(tick = (tick + 1) % 26), 380);
+})();
+</script>
+</body>
+</html>

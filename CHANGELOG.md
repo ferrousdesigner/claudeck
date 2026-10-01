@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.1 (2026-10-01)
+
+- Add the landing page, served from docs/ with GitHub Pages.
+
 ## v1.1.0 (2026-09-30)
 
 - Renamed to Claudeck. Existing settings, memory docs, saved prompts and the approval hook carry over automatically.
